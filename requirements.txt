@@ -1,0 +1,22 @@
+# Core JAX dependencies
+jax>=0.4.20
+jaxlib>=0.4.20
+flax>=0.7.5
+optax>=0.1.7
+
+# Model utilities
+orbax-checkpoint>=0.4.0
+einops>=0.7.0
+numpy>=1.24.0
+
+# Weight conversion
+safetensors>=0.4.0
+torch>=2.0.0  # CPU version for weight conversion
+transformers>=4.35.0  # For tokenizer
+
+# Optional for benchmarking
+tqdm>=4.65.0
+pandas>=2.0.0
+
+# Modal.com for GPU testing (optional)
+modal>=0.56.0
