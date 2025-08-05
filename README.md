@@ -25,19 +25,56 @@ pip install -r requirements.txt
 
 # Download model weights (13.5GB)
 bash scripts/download_model.sh
+
+# Convert weights to JAX format
+python scripts/convert_weights.py \
+  --model-path models/gpt-oss-20b \
+  --output-path models/gpt-oss-20b-jax
+
+# Test loading on CPU (optional)
+JAX_PLATFORM_NAME=cpu python scripts/test_loading.py \
+  --model-path models/gpt-oss-20b-jax
+```
+
+### Using Pre-converted Weights (Private Repo)
+
+For private repositories with Git LFS:
+
+```bash
+# Install Git LFS
+git lfs install
+
+# Clone with weights
+git clone --recursive https://github.com/your-org/jax-for-gpt-oss-20b-private.git
+
+# Weights will be in models/gpt-oss-20b/
 ```
 
 ## Quick Start
 
 ```python
 from jax_gpt_oss import load_model, generate
+import jax
+
+# Set device (CPU/GPU/TPU)
+# For CPU: os.environ["JAX_PLATFORM_NAME"] = "cpu"
 
 # Load model
-model, params = load_model("./models/gpt-oss-20b")
+model, params = load_model("./models/gpt-oss-20b-jax")
 
-# Generate text
+# Generate text (requires tokenizer)
+from transformers import AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained("./models/gpt-oss-20b")
+
 prompt = "The future of AI is"
-output = generate(model, params, prompt, max_tokens=100)
+output = generate(
+    model, 
+    params, 
+    prompt, 
+    max_tokens=100,
+    tokenizer=tokenizer,
+    temperature=0.7
+)
 print(output)
 ```
 
