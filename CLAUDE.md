@@ -65,9 +65,10 @@ jax-for-gpt-oss-20b/
 ## Weight Management
 
 ### Downloaded Weights
-- Location: `/root/models/gpt-oss-20b/`
-- Size: 13.5GB (3 safetensor files)
-- Format: MXFP4 quantized for MoE layers
+- Location: `/root/jax-for-gpt-oss-20b/models/gpt-oss-20b/`
+- Size: 13GB (3 safetensor files: model-00000-of-00002.safetensors, model-00001-of-00002.safetensors, model-00002-of-00002.safetensors)
+- Format: MXFP4 quantized for MoE layers, bfloat16 for most weights
+- Download script: `bash scripts/download_model.sh`
 
 ### Converted Weights
 - Location: `/root/models/gpt-oss-20b-jax/`

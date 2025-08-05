@@ -108,7 +108,7 @@ def load_all_weights_hybrid(model_path: Path) -> tuple[Dict[str, np.ndarray], Di
                     
                     # Convert to float16 if needed
                     if hasattr(tensor, 'numpy'):
-                        if tensor.dtype.name == 'bfloat16':
+                        if tensor.dtype == torch.bfloat16:
                             np_tensor = tensor.to(torch.float16).numpy()
                         else:
                             np_tensor = tensor.numpy()

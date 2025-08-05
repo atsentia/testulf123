@@ -8,3 +8,4 @@
 jax_params/** filter=lfs diff=lfs merge=lfs -text
 models/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
 models/**/jax_params/** filter=lfs diff=lfs merge=lfs -text
+models/gpt-oss-20b-jax-float16/*.pkl filter=lfs diff=lfs merge=lfs -text
