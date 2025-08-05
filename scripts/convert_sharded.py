@@ -70,10 +70,19 @@ def load_all_weights(model_path: Path) -> tuple[Dict[str, np.ndarray], Dict[str,
                 try:
                     tensor = f.get_tensor(key)
                     
+                    # Convert to float16 for JAX compatibility and space efficiency  
                     if hasattr(tensor, 'numpy'):
-                        np_tensor = tensor.float().numpy()
+                        if tensor.dtype == torch.bfloat16:
+                            # Convert bfloat16 → float16 (JAX compatible, half the size of float32)
+                            np_tensor = tensor.to(torch.float16).numpy()
+                        elif tensor.dtype == torch.float32:
+                            # Convert float32 → float16 to save space
+                            np_tensor = tensor.to(torch.float16).numpy()
+                        else:
+                            # Keep original dtype (likely already float16)
+                            np_tensor = tensor.numpy()
                     else:
-                        np_tensor = tensor.astype(np.float32)
+                        np_tensor = tensor
                     
                     all_weights[key] = np_tensor
                     
@@ -266,15 +275,17 @@ def merge_dict(target, source):
         else:
             target[key] = value
 
-def convert_to_jax(params):
+def convert_to_jax(params, dtype=None):
     """Convert numpy arrays to JAX arrays on demand."""
-    jax_params = {}
     
     def convert_recursive(obj):
         if isinstance(obj, dict):
             return {k: convert_recursive(v) for k, v in obj.items()}
         elif hasattr(obj, 'shape'):  # numpy array
-            return jnp.array(obj)
+            if dtype is not None:
+                return jnp.array(obj, dtype=dtype)
+            else:
+                return jnp.array(obj)
         else:
             return obj
     
@@ -293,9 +304,17 @@ if __name__ == "__main__":
     # Convert to JAX when needed
     print("\\n🔧 Converting embeddings to JAX...")
     if "embed_tokens" in params:
-        embed_jax = jnp.array(params["embed_tokens"]["weight"])
-        print(f"  Embeddings: {embed_jax.shape} {embed_jax.dtype}")
+        embed_np = params["embed_tokens"]["weight"]
+        print(f"  NumPy embeddings: {embed_np.shape} {embed_np.dtype}")
+        
+        # Convert to JAX (keeping float16, or convert to float32 if needed)
+        embed_jax = jnp.array(embed_np)  # Keep original dtype
+        # embed_jax = jnp.array(embed_np, dtype=jnp.float32)  # Or convert to float32
+        print(f"  JAX embeddings: {embed_jax.shape} {embed_jax.dtype}")
     
+    print("\\n📝 Note: Weights are stored in float16 to save space (~13GB vs ~45GB).")
+    print("     JAX can compute directly in float16, or convert to float32 with:")
+    print("     jax_weight = jnp.array(weight, dtype=jnp.float32)")
     print("\\n✅ Sharded loading successful!")
 '''
     
