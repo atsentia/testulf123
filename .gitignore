@@ -143,6 +143,15 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+jax_env/
+safejax_env/
+
+# Model weights (download locally, too large for GitHub)
+models/*/
+*.safetensors
+*.pkl
+*.bin
+*.pt
 
 # Spyder project settings
 .spyderproject
